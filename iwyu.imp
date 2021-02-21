@@ -1,0 +1,4 @@
+[
+  { include: ["@<gtest/.*>", "private", "<gtest/gtest.h>", "public"] },
+  { symbol: ["std::string", "private", "<string>", "public"] },
+]

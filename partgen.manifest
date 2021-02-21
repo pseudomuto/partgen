@@ -1,0 +1,11 @@
+{
+  "autodeskProduct":"Fusion360",
+  "type":"addin",
+  "author":"David Muto @ DFX Woodworking",
+  "description":{"":"Creates a bill of materials from component bodies"},
+  "supportedOS":"mac",
+  "editEnabled":false,
+  "id":"759fabde-79fd-4fd4-9dcd-f5a7e045808c",
+  "version":"0.1.0",
+  "runOnStartup":false
+}
