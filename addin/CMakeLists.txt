@@ -11,5 +11,5 @@ target_link_libraries(partgen PRIVATE libpartgen "${ADSK_CORE}" "${ADSK_FUSION}"
 # Installation should go to addins dir for Fusion 360
 install(TARGETS partgen DESTINATION "${AD_FUSION_INSTALL_DIR}")
 install(FILES "${CMAKE_SOURCE_DIR}/partgen.manifest" DESTINATION "${AD_FUSION_INSTALL_DIR}")
-install(DIRECTORY "${CMAKE_SOURCE_DIR}/resources/" DESTINATION "${AD_FUSION_INSTALL_DIR}/Resources")
+install(DIRECTORY "${CMAKE_SOURCE_DIR}/resources/" DESTINATION "${AD_FUSION_INSTALL_DIR}/resources")
 

@@ -1,9 +1,7 @@
 #pragma once
 
 #include <memory>  // for shared_ptr
-namespace partgen {
-class API;
-}
+namespace partgen { class API; }  // lines 6-6
 
 namespace partgen {
 /**
