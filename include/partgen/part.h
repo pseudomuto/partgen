@@ -1,6 +1,7 @@
 #pragma once
 
-#include <string>
+#include <string>       // for string, basic_string
+#include <string_view>  // for string_view
 
 namespace partgen {
 class Part {
@@ -19,6 +20,8 @@ class Part {
   double length() const { return length_; }
   double width() const { return width_; }
   double thickness() const { return thickness_; }
+
+  bool operator<(const Part& rhs) const;
 
  private:
   std::string name_;
