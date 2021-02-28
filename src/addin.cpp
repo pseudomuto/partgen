@@ -1,6 +1,6 @@
 #include "partgen/addin.h"
-#include "generate_command.h"
-#include "partgen/api.h"
+#include <type_traits>         // for remove_extent_t
+#include "generate_command.h"  // for GenerateCommand
 
 namespace {
 constexpr auto kPanelId = "SolidScriptsAddinsPanel";

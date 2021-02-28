@@ -1,15 +1,31 @@
 #include "fusion.h"
+#include <algorithm>                                        // for remove_if
+#include <iterator>                                         // for back_inse...
+#include <type_traits>                                      // for remove_ex...
 #include "Core/Application/Application.h"                   // for Application
+#include "Core/Application/Product.h"                       // for Product
 #include "Core/UserInterface/CommandCreatedEvent.h"         // for CommandCr...
 #include "Core/UserInterface/CommandCreatedEventHandler.h"  // for CommandCr...
-#include "Core/UserInterface/CommandDefinition.h"           // for CommandDefinition
-#include "Core/UserInterface/CommandDefinitions.h"          // for CommandDefinitions
-#include "Core/UserInterface/ToolbarControl.h"              // for ToolbarControl
-#include "Core/UserInterface/ToolbarControls.h"             // for ToolbarControls
+#include "Core/UserInterface/CommandDefinition.h"           // for CommandDe...
+#include "Core/UserInterface/CommandDefinitions.h"          // for CommandDe...
+#include "Core/UserInterface/ToolbarControl.h"              // for ToolbarCo...
+#include "Core/UserInterface/ToolbarControls.h"             // for ToolbarCo...
 #include "Core/UserInterface/ToolbarPanel.h"                // for ToolbarPanel
-#include "Core/UserInterface/ToolbarPanelList.h"            // for ToolbarPanelList
-#include "Core/UserInterface/UserInterface.h"               // for UserInterface
-#include "partgen/command.h"
+#include "Core/UserInterface/ToolbarPanelList.h"            // for ToolbarPa...
+#include "Core/UserInterface/UserInterface.h"               // for UserInter...
+#include "Fusion/BRep/BRepBodies.h"                         // for BRepBodies
+#include "Fusion/BRep/BRepBody.h"                           // for BRepBody
+#include "Fusion/Components/Component.h"                    // for Component
+#include "Fusion/Components/Occurrence.h"                   // for Occurrence
+#include "Fusion/Components/OccurrenceList.h"               // for OccurrenceList
+#include "Fusion/Fusion/Design.h"                           // for Design
+#include "partgen/command.h"                                // for Command
+#include "partgen/part.h"                                   // for Part
+namespace adsk {
+namespace core {
+class CommandCreatedEventArgs;
+}
+}  // namespace adsk
 
 namespace {
 class CommandHandler : public adsk::core::CommandCreatedEventHandler {
@@ -21,6 +37,12 @@ class CommandHandler : public adsk::core::CommandCreatedEventHandler {
  private:
   std::shared_ptr<partgen::Command> cmd_;
 };
+
+partgen::Part toPart(const adsk::core::Ptr<adsk::fusion::BRepBody>& body) {
+  // TODO: calculate dimensions
+  auto part = partgen::Part(body->parentComponent()->partNumber() + "." + body->name(), 0, 0, 0);
+  return part;
+}
 }  // namespace
 
 Fusion::~Fusion() {
@@ -59,4 +81,28 @@ bool Fusion::registerCommand(const std::string_view& panel, const std::shared_pt
 
   uiPanel->controls()->addCommand(uiCmd);
   return true;
+}
+
+std::vector<partgen::Part> Fusion::listParts() const {
+  auto design = app_->activeProduct()->cast<adsk::fusion::Design>();
+  auto occurrences = design->rootComponent()->allOccurrences();
+  auto components = std::vector<adsk::core::Ptr<adsk::fusion::Component>>{};
+
+  auto toComponent = [](const adsk::core::Ptr<adsk::fusion::Occurrence>& occ) { return occ->component(); };
+  auto bodyLess = [](const adsk::core::Ptr<adsk::fusion::Component>& comp) { return comp->bRepBodies()->count() == 0; };
+
+  // get all components that have bodies
+  std::transform(occurrences.begin(), occurrences.end(), std::back_inserter(components), toComponent);
+  components.erase(std::remove_if(components.begin(), components.end(), bodyLess), components.end());
+
+  auto parts = std::vector<partgen::Part>{};
+  parts.reserve(components.size() * 1.1);  // assuming most components have a single body
+
+  for (const auto& comp : components) {
+    for (const auto& body : comp->bRepBodies()) {
+      parts.push_back(toPart(body));
+    }
+  }
+
+  return parts;
 }

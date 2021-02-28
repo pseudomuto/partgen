@@ -1,9 +1,11 @@
 #pragma once
 
 #include <string_view>
+#include <vector>
 namespace partgen {
 class Command;
-}
+class Part;
+}  // namespace partgen
 
 namespace partgen {
 /**
@@ -27,5 +29,11 @@ class API {
    * @return whether or not the command was added
    */
   virtual bool registerCommand(const std::string_view& panel, const std::shared_ptr<Command>& cmd) = 0;
+
+  /**
+   * Generates a list of all component bodies as Part objects.
+   * @return the list of parts
+   */
+  virtual std::vector<partgen::Part> listParts() const = 0;
 };
 }  // namespace partgen

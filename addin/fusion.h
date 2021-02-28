@@ -12,6 +12,7 @@ class Application;
 }  // namespace adsk
 namespace partgen {
 class Command;
+class Part;
 }
 
 class Fusion : public partgen::API {
@@ -22,6 +23,8 @@ class Fusion : public partgen::API {
   void messageBox(const std::string_view& message) const override;
 
   bool registerCommand(const std::string_view& panel, const std::shared_ptr<partgen::Command>& cmd) override;
+
+  std::vector<partgen::Part> listParts() const override;
 
  private:
   adsk::core::Ptr<adsk::core::Application> app_;
