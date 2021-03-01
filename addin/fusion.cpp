@@ -1,9 +1,12 @@
 #include "fusion.h"
 #include <algorithm>                                        // for remove_if
+#include <functional>                                       // for greater
 #include <iterator>                                         // for back_inse...
 #include <type_traits>                                      // for remove_ex...
 #include "Core/Application/Application.h"                   // for Application
 #include "Core/Application/Product.h"                       // for Product
+#include "Core/Geometry/BoundingBox3D.h"                    // for BoundingBox3D
+#include "Core/Geometry/Point3D.h"                          // for Point3D
 #include "Core/UserInterface/CommandCreatedEvent.h"         // for CommandCr...
 #include "Core/UserInterface/CommandCreatedEventHandler.h"  // for CommandCr...
 #include "Core/UserInterface/CommandDefinition.h"           // for CommandDe...
@@ -19,6 +22,7 @@
 #include "Fusion/Components/Occurrence.h"                   // for Occurrence
 #include "Fusion/Components/OccurrenceList.h"               // for OccurrenceList
 #include "Fusion/Fusion/Design.h"                           // for Design
+#include "Fusion/Fusion/FusionUnitsManager.h"               // for FusionUnitsManager
 #include "partgen/command.h"                                // for Command
 #include "partgen/part.h"                                   // for Part
 namespace adsk {
@@ -39,9 +43,17 @@ class CommandHandler : public adsk::core::CommandCreatedEventHandler {
 };
 
 partgen::Part toPart(const adsk::core::Ptr<adsk::fusion::BRepBody>& body) {
-  // TODO: calculate dimensions
-  auto part = partgen::Part(body->parentComponent()->partNumber() + "." + body->name(), 0, 0, 0);
-  return part;
+  auto um = body->parentComponent()->parentDesign()->fusionUnitsManager();
+  auto box = body->boundingBox();
+  auto min = box->minPoint();
+  auto max = box->maxPoint();
+
+  // HACK: not sure what to do here. For now, length >= width >= thickness is the heuristic.
+  auto dimensions = std::vector{max->x() - min->x(), max->y() - min->y(), max->z() - min->z()};
+  std::sort(dimensions.begin(), dimensions.end(), std::greater<double>{});
+
+  return partgen::Part(body->parentComponent()->partNumber() + "." + body->name(), dimensions[0], dimensions[1],
+                       dimensions[2]);
 }
 }  // namespace
 
