@@ -3,8 +3,10 @@
 #include <gmock/gmock-spec-builders.h>  // for EXPECT_CALL, MockSpec, TypedE...
 #include <gtest/gtest.h>                // for Test, AssertionResult, Message
 #include <functional>                   // for __base
+#include <sstream>                      // for stringstream
 #include <vector>                       // for vector
 #include "mocks/api.h"                  // for API
+#include "part_list_generator.h"        // for PartListGenerator
 #include "partgen/part.h"               // for Part
 
 TEST(GenerateCommand, DefinesMetadata) {
@@ -18,11 +20,14 @@ TEST(GenerateCommand, DefinesMetadata) {
 }
 
 TEST(GenerateCommand, ExecuteGetsPartsListFromAPI) {
-  auto parts = std::vector<partgen::Part>{partgen::Part("A", 0, 0, 1.2), partgen::Part("B", 0, 0, 0.6)};
+  auto parts = std::vector<partgen::Part>{partgen::Part("A", 1, 2, 1.2), partgen::Part("B", 3, 4, 0.6)};
+
+  auto stream = std::stringstream{};
+  stream << partgen::PartListGenerator(parts, "cm");
 
   auto api = std::make_shared<mocks::API>();
   EXPECT_CALL(*api, listParts).WillOnce(::testing::Return(parts));
-  EXPECT_CALL(*api, messageBox).Times(parts.size());
+  EXPECT_CALL(*api, messageBox(::testing::Eq(stream.str())));
 
   auto cmd = partgen::GenerateCommand(api);
   cmd.execute();
