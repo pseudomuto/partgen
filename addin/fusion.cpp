@@ -5,6 +5,7 @@
 #include <sstream>                                          // for stringstream
 #include <type_traits>                                      // for remove_ex...
 #include "Core/Application/Application.h"                   // for Application
+#include "Core/Application/Document.h"                      // for Document
 #include "Core/Application/Product.h"                       // for Product
 #include "Core/Geometry/BoundingBox3D.h"                    // for BoundingBox3D
 #include "Core/Geometry/Point3D.h"                          // for Point3D
@@ -12,6 +13,7 @@
 #include "Core/UserInterface/CommandCreatedEventHandler.h"  // for CommandCr...
 #include "Core/UserInterface/CommandDefinition.h"           // for CommandDe...
 #include "Core/UserInterface/CommandDefinitions.h"          // for CommandDe...
+#include "Core/UserInterface/FileDialog.h"                  // for FileDialog
 #include "Core/UserInterface/ToolbarControl.h"              // for ToolbarCo...
 #include "Core/UserInterface/ToolbarControls.h"             // for ToolbarCo...
 #include "Core/UserInterface/ToolbarPanel.h"                // for ToolbarPanel
@@ -127,4 +129,16 @@ std::string Fusion::measurement(double centimetres) const {
   stream << um->convert(centimetres, "cm", units) << units;
 
   return stream.str();
+}
+
+std::string Fusion::selectOutputFile() const {
+  auto dlg = app_->userInterface()->createFileDialog();
+  dlg->filter("CSV (*.csv)");
+  dlg->filterIndex(0);
+  dlg->isMultiSelectEnabled(false);
+  dlg->initialFilename(app_->activeProduct()->parentDocument()->name() + ".csv");
+  dlg->title("Save Parts List");
+  if (dlg->showSave() != adsk::core::DialogOK) return "";
+
+  return dlg->filename();
 }

@@ -28,6 +28,8 @@ class Fusion : public partgen::API {
 
   std::string measurement(double centimetres) const override;
 
+  std::string selectOutputFile() const override;
+
  private:
   adsk::core::Ptr<adsk::core::Application> app_;
   std::map<std::string, std::string> registeredCommands_;

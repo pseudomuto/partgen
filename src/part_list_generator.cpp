@@ -10,11 +10,11 @@ class API;
 
 namespace {
 void write(const std::shared_ptr<partgen::API>& api, std::ostream& out, const partgen::Part& part, int qty) {
-  out << part.name() << ",";
-  out << qty << ",";
   out << api->measurement(part.length()) << ",";
   out << api->measurement(part.width()) << ",";
-  out << api->measurement(part.thickness()) << std::endl;
+  out << qty << ",";
+  out << api->measurement(part.thickness()) << ",";
+  out << part.name() << std::endl;
 }
 }  // namespace
 

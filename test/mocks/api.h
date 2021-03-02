@@ -14,5 +14,6 @@ class API : public partgen::API, std::enable_shared_from_this<API> {
   MOCK_METHOD(bool, registerCommand, (const std::string_view&, const std::shared_ptr<partgen::Command>&), (override));
   MOCK_METHOD(std::vector<partgen::Part>, listParts, (), (const, override));
   MOCK_METHOD(std::string, measurement, (double), (const, override));
+  MOCK_METHOD(std::string, selectOutputFile, (), (const, override));
 };
 }  // namespace mocks

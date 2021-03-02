@@ -1,12 +1,11 @@
 #include "generate_command.h"
-#include <gmock/gmock-actions.h>        // for Return, ImplicitCast_, Return...
-#include <gmock/gmock-spec-builders.h>  // for EXPECT_CALL, MockSpec, TypedE...
+#include <gmock/gmock-actions.h>        // for Return, ReturnAction, Implici...
+#include <gmock/gmock-matchers.h>       // for Eq
+#include <gmock/gmock-spec-builders.h>  // for TypedExpectation, EXPECT_CALL
 #include <gtest/gtest.h>                // for Test, AssertionResult, Message
 #include <functional>                   // for __base
-#include <sstream>                      // for stringstream
 #include <vector>                       // for vector
 #include "mocks/api.h"                  // for API
-#include "part_list_generator.h"        // for PartListGenerator
 #include "partgen/part.h"               // for Part
 
 TEST(GenerateCommand, DefinesMetadata) {
@@ -26,6 +25,7 @@ TEST(GenerateCommand, ExecuteGetsPartsListFromAPI) {
   auto parts = std::vector<partgen::Part>{partgen::Part("A", 1, 2, 1.2), partgen::Part("B", 3, 4, 0.6)};
 
   auto api = std::make_shared<mocks::API>();
+  EXPECT_CALL(*api, selectOutputFile).WillOnce(Return("/tmp/parts.csv"));
   EXPECT_CALL(*api, listParts).WillOnce(Return(parts));
   EXPECT_CALL(*api, measurement)
       .WillOnce(Return("1cm"))
@@ -35,7 +35,16 @@ TEST(GenerateCommand, ExecuteGetsPartsListFromAPI) {
       .WillOnce(Return("4cm"))
       .WillOnce(Return("0.6cm"));
 
-  EXPECT_CALL(*api, messageBox);
+  auto cmd = partgen::GenerateCommand(api);
+  cmd.execute();
+}
+
+TEST(GenerateCommand, ExecuteBailsWhenNotFileSelected) {
+  using ::testing::Return;
+
+  auto api = std::make_shared<mocks::API>();
+  EXPECT_CALL(*api, selectOutputFile).WillOnce(Return(""));
+  // No other calls made
 
   auto cmd = partgen::GenerateCommand(api);
   cmd.execute();

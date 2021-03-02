@@ -42,5 +42,11 @@ class API {
    * @return the measurement (including unit suffix) in the document's units
    */
   virtual std::string measurement(double centimetres) const = 0;
+
+  /**
+   * Gets the path where the part list should be save.
+   * @return the path or an empty string if cancelled.
+   */
+  virtual std::string selectOutputFile() const = 0;
 };
 }  // namespace partgen

@@ -27,11 +27,11 @@ TEST(PartListGenerator, GeneratesAnOrderedSetOfPartsAndQuantities) {
   auto generator = partgen::PartListGenerator(api);
 
   auto expected =
-      "C,1,0mm,0mm,18mm\n"
-      "D,1,0mm,0mm,18mm\n"
-      "A,2,0mm,0mm,12mm\n"
-      "B,3,0mm,0mm,6mm\n"
-      "E,2,0mm,0mm,6mm\n";
+      "0mm,0mm,1,18mm,C\n"
+      "0mm,0mm,1,18mm,D\n"
+      "0mm,0mm,2,12mm,A\n"
+      "0mm,0mm,3,6mm,B\n"
+      "0mm,0mm,2,6mm,E\n";
 
   auto str = std::stringstream{};
   str << generator;
