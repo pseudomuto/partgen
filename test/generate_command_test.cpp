@@ -20,14 +20,22 @@ TEST(GenerateCommand, DefinesMetadata) {
 }
 
 TEST(GenerateCommand, ExecuteGetsPartsListFromAPI) {
+  using ::testing::Eq;
+  using ::testing::Return;
+
   auto parts = std::vector<partgen::Part>{partgen::Part("A", 1, 2, 1.2), partgen::Part("B", 3, 4, 0.6)};
 
-  auto stream = std::stringstream{};
-  stream << partgen::PartListGenerator(parts, "cm");
-
   auto api = std::make_shared<mocks::API>();
-  EXPECT_CALL(*api, listParts).WillOnce(::testing::Return(parts));
-  EXPECT_CALL(*api, messageBox(::testing::Eq(stream.str())));
+  EXPECT_CALL(*api, listParts).WillOnce(Return(parts));
+  EXPECT_CALL(*api, measurement)
+      .WillOnce(Return("1cm"))
+      .WillOnce(Return("2cm"))
+      .WillOnce(Return("1.2cm"))
+      .WillOnce(Return("3cm"))
+      .WillOnce(Return("4cm"))
+      .WillOnce(Return("0.6cm"));
+
+  EXPECT_CALL(*api, messageBox);
 
   auto cmd = partgen::GenerateCommand(api);
   cmd.execute();

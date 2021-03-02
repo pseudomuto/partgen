@@ -13,7 +13,7 @@ class Application;
 namespace partgen {
 class Command;
 class Part;
-}
+}  // namespace partgen
 
 class Fusion : public partgen::API {
  public:
@@ -25,6 +25,8 @@ class Fusion : public partgen::API {
   bool registerCommand(const std::string_view& panel, const std::shared_ptr<partgen::Command>& cmd) override;
 
   std::vector<partgen::Part> listParts() const override;
+
+  std::string measurement(double centimetres) const override;
 
  private:
   adsk::core::Ptr<adsk::core::Application> app_;

@@ -2,6 +2,7 @@
 #include <algorithm>                                        // for remove_if
 #include <functional>                                       // for greater
 #include <iterator>                                         // for back_inse...
+#include <sstream>                                          // for stringstream
 #include <type_traits>                                      // for remove_ex...
 #include "Core/Application/Application.h"                   // for Application
 #include "Core/Application/Product.h"                       // for Product
@@ -117,4 +118,13 @@ std::vector<partgen::Part> Fusion::listParts() const {
   }
 
   return parts;
+}
+
+std::string Fusion::measurement(double centimetres) const {
+  auto um = app_->activeProduct()->cast<adsk::fusion::Design>()->fusionUnitsManager();
+  auto units = um->defaultLengthUnits();
+  auto stream = std::stringstream{};
+  stream << um->convert(centimetres, "cm", units) << units;
+
+  return stream.str();
 }

@@ -35,5 +35,12 @@ class API {
    * @return the list of parts
    */
   virtual std::vector<partgen::Part> listParts() const = 0;
+
+  /**
+   * Returns the measurement value in the document's units (e.g. 20mm)
+   * @param centimetres the measurement in cm
+   * @return the measurement (including unit suffix) in the document's units
+   */
+  virtual std::string measurement(double centimetres) const = 0;
 };
 }  // namespace partgen

@@ -9,7 +9,7 @@ std::string partgen::GenerateCommand::name() const { return "Generate Parts List
 std::string partgen::GenerateCommand::description() const { return "Generate a CSV of parts from component bodies"; }
 
 void partgen::GenerateCommand::execute() const {
-  auto generator = partgen::PartListGenerator(api_->listParts(), "cm");
+  auto generator = partgen::PartListGenerator(api_);
   auto stream = std::stringstream{};
   stream << generator;
   api_->messageBox(stream.str());
